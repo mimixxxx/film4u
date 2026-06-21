@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="FlixMasr - مشاهدة أفلام عربية ومصرية وأجنبية مترجمة اونلاين مجاناً بجودة عالية HD">
+<title>FlixMasr - أفلام ومسلسلات اونلاين</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',Tahoma,sans-serif; background:#0a0a0f; color:#fff; direction:rtl; }
+nav { background:#111118; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #ffffff10; position:sticky; top:0; z-index:100; }
+.logo { font-size:22px; font-weight:700; color:#e8b84b; text-decoration:none; }
+.nav-links { display:flex; gap:20px; }
+.nav-links a { color:#aaa; text-decoration:none; font-size:14px; }
+.nav-links a:hover { color:#e8b84b; }
+.search-box { display:flex; align-items:center; background:#1e1e2e; border:1px solid #ffffff15; border-radius:24px; padding:8px 16px; gap:8px; }
+.search-box input { background:none; border:none; outline:none; color:#fff; font-size:13px; width:180px; font-family:inherit; }
+.search-box input::placeholder { color:#555; }
+.cats { padding:20px 24px 0; display:flex; gap:8px; flex-wrap:wrap; }
+.cat { background:#1a1a2e; border:1px solid #ffffff15; border-radius:24px; padding:7px 16px; font-size:13px; color:#aaa; cursor:pointer; border:none; font-family:inherit; transition:all 0.2s; }
+.cat:hover,.cat.active { background:#e8b84b; color:#1a0f00; font-weight:600; }
+.ad-banner { margin:20px 24px 0; background:#111118; border:1px solid #e8b84b20; border-radius:10px; padding:14px; text-align:center; min-height:60px; display:flex; align-items:center; justify-content:center; }
+.ad-banner p { font-size:12px; color:#444; }
+.section { padding:24px 24px 0; }
+.sec-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.sec-title { font-size:16px; font-weight:600; }
+.movies-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.movie-card { background:#111118; border-radius:10px; overflow:hidden; cursor:pointer; border:1px solid #ffffff08; transition:all 0.2s; }
+.movie-card:hover { border-color:#e8b84b50; transform:translateY(-4px); }
+.movie-poster { width:100%; aspect-ratio:2/3; object-fit:cover; display:block; background:#1e1e2e; }
+.poster-placeholder { width:100%; aspect-ratio:2/3; background:#1e1e2e; display:flex; align-items:center; justify-content:center; font-size:40px; }
+.movie-info { padding:10px 12px; }
+.movie-title { font-size:13px; font-weight:500; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.movie-meta { display:flex; justify-content:space-between; align-items:center; }
+.movie-year { font-size:11px; color:#555; }
+.movie-rating { font-size:11px; color:#e8b84b; }
+.quality-badge { display:inline-block; background:#e8b84b; color:#1a0f00; font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; margin-bottom:6px; }
+.loading { text-align:center; padding:40px; color:#555; font-size:14px; }
+.loading-spinner { font-size:30px; animation:spin 1s linear infinite; display:inline-block; margin-bottom:10px; }
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+footer { margin-top:40px; background:#111118; border-top:1px solid #ffffff10; padding:24px; text-align:center; }
+footer p { font-size:13px; color:#444; }
+footer a { color:#e8b84b; text-decoration:none; }
+@media(max-width:768px) { .nav-links{display:none} .search-box input{width:120px} }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">FlixMasr</a>
+  <div class="nav-links">
+    <a href="#" onclick="loadMovies('egyptian')">مصري</a>
+    <a href="#" onclick="loadMovies('arabic')">عربي</a>
+    <a href="#" onclick="loadMovies('popular')">أجنبي</a>
+    <a href="#" onclick="loadMovies('series')">مسلسلات</a>
+  </div>
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="ابحث عن فيلم..." onkeyup="searchMovies(this.value)">
+  </div>
+</nav>
+
+<div class="cats">
+  <button class="cat active" onclick="loadMovies('egyptian');setActive(this)">🇪🇬 مصري</button>
+  <button class="cat" onclick="loadMovies('arabic');setActive(this)">🌍 عربي</button>
+  <button class="cat" onclick="loadMovies('popular');setActive(this)">🔥 الأكثر مشاهدة</button>
+  <button class="cat" onclick="loadMovies('action');setActive(this)">💥 أكشن</button>
+  <button class="cat" onclick="loadMovies('comedy');setActive(this)">😂 كوميدي</button>
+  <button class="cat" onclick="loadMovies('horror');setActive(this)">👻 رعب</button>
+  <button class="cat" onclick="loadMovies('series');setActive(this)">📺 مسلسلات</button>
+</div>
+
+<div class="ad-banner">
+  <!-- ضع كود إعلان Adsterra هنا -->
+  <p>[ مساحة إعلانية - ضع كود Adsterra هنا ]</p>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <div class="sec-title" id="sectionTitle">🎬 أفلام مصرية</div>
+  </div>
+  <div id="moviesContainer" class="movies-grid">
+    <div class="loading">
+      <div class="loading-spinner">⏳</div>
+      <p>جاري تحميل الأفلام...</p>
+    </div>
+  </div>
+</div>
+
+<div class="ad-banner" style="margin-top:28px">
+  <!-- ضع كود إعلان Adsterra هنا -->
+  <p>[ مساحة إعلانية - ضع كود Adsterra هنا ]</p>
+</div>
+
+<footer>
+  <p>© 2024 <a href="#">FlixMasr</a> — جميع الحقوق محفوظة</p>
+  <p style="margin-top:8px"><a href="#">سياسة الخصوصية</a> • <a href="#">اتصل بنا</a></p>
+</footer>
+
+<script>
+const API_KEY = 'c65f97e99c909e67719dcb55807d20cb'; // ← ضع API Key بتاعك هنا
+const IMG_BASE = 'https://image.tmdb.org/t/p/w500';
+
+const categories = {
+  egyptian: { url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=ar&region=EG&sort_by=popularity.desc&language=ar`, title: '🇪🇬 أفلام مصرية' },
+  arabic: { url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=ar&sort_by=popularity.desc&language=ar`, title: '🌍 أفلام عربية' },
+  popular: { url: `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=ar`, title: '🔥 الأكثر مشاهدة' },
+  action: { url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&language=ar&sort_by=popularity.desc`, title: '💥 أفلام أكشن' },
+  comedy: { url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=35&language=ar&sort_by=popularity.desc`, title: '😂 أفلام كوميدي' },
+  horror: { url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&language=ar&sort_by=popularity.desc`, title: '👻 أفلام رعب' },
+  series: { url: `https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}&language=ar`, title: '📺 مسلسلات' }
+};
+
+async function loadMovies(type) {
+  const container = document.getElementById('moviesContainer');
+  const titleEl = document.getElementById('sectionTitle');
+  container.innerHTML = '<div class="loading"><div class="loading-spinner">⏳</div><p>جاري تحميل الأفلام...</p></div>';
+  titleEl.textContent = categories[type].title;
+  try {
+    const res = await fetch(categories[type].url);
+    const data = await res.json();
+    const items = data.results || [];
+    if (!items.length) { container.innerHTML = '<div class="loading"><p>لا توجد نتائج</p></div>'; return; }
+    container.innerHTML = items.map(m => movieCard(m)).join('');
+  } catch(e) {
+    container.innerHTML = '<div class="loading"><p>⚠️ تأكد من إضافة TMDB API Key</p></div>';
+  }
+}
+
+function movieCard(m) {
+  const title = m.title || m.name || 'بدون عنوان';
+  const year = (m.release_date || m.first_air_date || '').slice(0,4);
+  const rating = m.vote_average ? m.vote_average.toFixed(1) : '?';
+  const poster = m.poster_path ? `<img class="movie-poster" src="${IMG_BASE}${m.poster_path}" alt="${title}" loading="lazy">` : `<div class="poster-placeholder">🎬</div>`;
+  return `<div class="movie-card" onclick="watchMovie(${m.id},'${title.replace(/'/g,"\\'")}')">
+    ${poster}
+    <div class="movie-info">
+      <span class="quality-badge">HD</span>
+      <div class="movie-title">${title}</div>
+      <div class="movie-meta">
+        <span class="movie-year">${year}</span>
+        <span class="movie-rating">⭐ ${rating}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function watchMovie(id, title) {
+  alert('هتضيف رابط المشاهدة هنا لفيلم: ' + title);
+}
+
+async function searchMovies(q) {
+  if (q.length < 2) return;
+  const container = document.getElementById('moviesContainer');
+  document.getElementById('sectionTitle').textContent = '🔍 نتايج البحث: ' + q;
+  try {
+    const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=ar`);
+    const data = await res.json();
+    container.innerHTML = (data.results||[]).map(m => movieCard(m)).join('') || '<div class="loading"><p>لا توجد نتائج</p></div>';
+  } catch(e) {}
+}
+
+function setActive(el) {
+  document.querySelectorAll('.cat').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+loadMovies('egyptian');
+</script>
+</body>
+</html>
